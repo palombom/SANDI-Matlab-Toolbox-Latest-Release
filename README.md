@@ -29,26 +29,26 @@ The script "SANDI_batch_analysis" shows how to use the toolbox to perform the SA
 
 The code assumes that data are organized in the following way:
 
-[ ] StudyMainFolder
- |---> [ ] Dataset_1
-        |---> dwi.nii.gz
-        |---> bvals.bval
-        |---> bvecs.bvec
-        |---> mask.nii.gz
-        |---> noisemap.nii.gz
- |---> [ ] Dataset_2
-        |---> dwi.nii.gz
-        |---> bvals.bval
-        |---> bvecs.bvec
-        |---> mask.nii.gz
-        |---> noisemap.nii.gz
-   ...
- |---> [ ] Dataset_n
-        |---> dwi.nii.gz
-        |---> bvals.bval
-        |---> bvecs.bvec
-        |---> mask.nii.gz
-        |---> noisemap.nii.gz
+- StudyMainFolder
+  - Dataset_1
+    - dwi.nii.gz
+    - bvals.bval
+    - bvecs.bvec
+    - mask.nii.gz
+    - noisemap.nii.gz
+  - Dataset_2
+    - dwi.nii.gz
+    - bvals.bval
+    - bvecs.bvec
+    - mask.nii.gz
+    - noisemap.nii.gz
+  - ...
+  - Dataset_n
+    - dwi.nii.gz
+    - bvals.bval
+    - bvecs.bvec
+    - mask.nii.gz
+    - noisemap.nii.gz
 
 The OUTPUT of the analysis will be stored in a new folder 'SANDI_Output' within the corresponding 'Dataset_xxx' folder
 
