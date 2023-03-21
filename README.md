@@ -1,2 +1,5 @@
-# SANDI-Matlab-Toolbox-Latest-Release
-The latest release of the SANDI Matlab Toolbox
+# SANDI Matlab Toolbox: Latest Release
+
+This repository contains the latest release of the SANDI Matlab Toolbox.
+
+
