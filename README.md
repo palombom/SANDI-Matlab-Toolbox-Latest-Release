@@ -19,7 +19,7 @@ If you use Linux or MacOS:
 2. Navigate to your destination folder;
 3. Clone SANDI Matlab Toolbox:
 ```
-$ git clone https://github.com/palombom/SANDI-Matlab-Toolbox.git 
+$ git clone https://github.com/palombom/SANDI-Matlab-Toolbox-Latest-Release.git 
 ```
 4. The main script is called "SANDI_batch_analysis" and it explains how to analyse one or more datasets with the SANDI model. 
 5. You should now be able to use the code. 
