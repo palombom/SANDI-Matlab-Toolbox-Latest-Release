@@ -47,7 +47,7 @@ classdef report_generator < handle
         % Open the report for writing
         %
         function open(obj)
-            obj.fid = fopen([obj.report_dir filesep 'index.html'], 'w');
+            obj.fid = fopen([obj.report_dir filesep 'report.html'], 'w');
             if ~obj.wrote_header
                 obj.write_header();
                 obj.wrote_header = 1;
