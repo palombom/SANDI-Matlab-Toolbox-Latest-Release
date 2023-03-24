@@ -1,4 +1,4 @@
-function [Mdl, training_performances] = train_MLP_matlab(database_train, params_train, n_layers, n_neurons, n_MLPs)
+function trainedML = train_MLP_matlab(database_train, params_train, n_layers, n_neurons, n_MLPs)
 
 % Train a Multi Layer Perceptron regressor for SANDI fitting
 %
@@ -21,23 +21,39 @@ end
 
 rng(1);
 
+trainedML = struct;
+
 if method == 1
     Mdl = cell(n_MLPs,1);
     training_performances = cell(n_MLPs,1);
 
+    MLprediction = zeros(size(params_train,1),size(params_train,2), n_MLPs);
+    Rsq = zeros(size(params_train,2),n_MLPs);
+    Slope = zeros(size(params_train,2),n_MLPs);
+    Intercept = zeros(size(params_train,2),n_MLPs);
+
+
     for j = 1:n_MLPs
 
-        Mdl{j} = feedforwardnet(net_structure, 'trainlm');
+        Mdl{j} = feedforwardnet(net_structure);
         Mdl{j}.performParam.regularization = 0;
         Mdl{j}.trainParam.showWindow = false;
         Mdl{j}.trainParam.showCommandLine = false;
         Mdl{j}.trainParam.max_fail = 10;
-                    nlayers = numel(Mdl{j}.layers);
-            for ii=1:nlayers-1
-                Mdl{j}.layers{ii}.transferFcn = 'logsig'; % Keep better the output is within rage [0 1]
-            end
+        Mdl{j}.inputs{1}.processFcns = {'mapminmax'};
 
-        [Mdl{j}, training_performances{j}] = train(Mdl, database_train', params_train');
+        nlayers = numel(Mdl{j}.layers);
+        for ii=1:nlayers-1
+            Mdl{j}.layers{ii}.transferFcn = 'logsig'; % Keep better the output is within rage [0 1]
+        end
+
+        [Mdl{j}, training_performances{j}] = train(Mdl, database_train', params_train', 'useParallel', 'yes');
+
+        MLprediction(:,:,j) = Mdl(database_train')';
+
+        for i = 1:size(params_train,2)
+            [Rsq(i,j),Slope(i,j),Intercept(i,j)] = regression(params_train(:,i)', MLprediction(:,i,j)');
+        end
 
         disp(['   - MLP ' num2str(j) '/' num2str(n_MLPs) ' trained'])
     end
@@ -46,15 +62,21 @@ else
     training_performances = cell(size(params_train,2),n_MLPs);
     Mdl = cell(size(params_train,2),n_MLPs);
 
+    MLprediction = zeros(size(params_train,1),size(params_train,2), n_MLPs);
+    Rsq = zeros(size(params_train,2),n_MLPs);
+    Slope = zeros(size(params_train,2),n_MLPs);
+    Intercept = zeros(size(params_train,2),n_MLPs);
+
     for j = 1:n_MLPs
 
 
         for i = 1:size(params_train,2)
-            Mdl{i,j} = feedforwardnet(net_structure, 'trainlm');
+            Mdl{i,j} = feedforwardnet(net_structure);
             Mdl{i,j}.performParam.regularization = 0;
             Mdl{i,j}.trainParam.showWindow = false;
             Mdl{i,j}.trainParam.showCommandLine = false;
             Mdl{i,j}.trainParam.max_fail = 10;
+            Mdl{i,j}.inputs{1}.processFcns = {'mapminmax'};
 
             nlayers = numel(Mdl{i,j}.layers);
             for ii=1:nlayers-1
@@ -63,9 +85,11 @@ else
 
         end
 
-        parfor i=1:size(params_train,2)
-
-            [Mdl{i,j}, training_performances{i,j}] = train(Mdl{i,j}, database_train', params_train(:,i)');
+        for i=1:size(params_train,2)
+            disp(['   - MLP for model parameter ' num2str(i) '/' num2str(size(params_train,2)) ' training'])
+            [Mdl{i,j}, training_performances{i,j}] = train(Mdl{i,j}, database_train', params_train(:,i)', 'useParallel', 'yes');
+            MLprediction(:,i,j) = Mdl{i,j}(database_train');
+            [Rsq(i,j),Slope(i,j),Intercept(i,j)] = regression(params_train(:,i)', MLprediction(:,i,j)');
 
         end
 
@@ -75,6 +99,12 @@ else
 
 
 end
+
+trainedML.Mdl = Mdl;
+trainedML.training_performances = training_performances;
+trainedML.Rsq = Rsq;
+trainedML.Slope = Slope;
+trainedML.Intercept = Intercept;
 
 tt = toc;
 
