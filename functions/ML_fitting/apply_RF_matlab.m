@@ -1,4 +1,4 @@
-function mpgMean = apply_RF_matlab(signal, Mdl)
+function mpgMean = apply_RF_matlab(signal, trainedML, MLdebias)
 % Apply pretrained Random Forest regressor
 %
 % Author:
@@ -10,10 +10,19 @@ function mpgMean = apply_RF_matlab(signal, Mdl)
 
 tic
 
+Mdl = trainedML.Mdl;
+Slope = trainedML.Slope;
+Intercept = trainedML.Intercept;
+
 mpgMean = zeros(size(signal,1), numel(Mdl));
 
 parfor i=1:numel(Mdl)
     mpgMean(:,i) = predict(Mdl{i},signal);
+    if MLdebias==1
+        if i==1 || i==3 || i==5
+            mpgMean(:,i) = (mpgMean(:,i) - Intercept(i))./Slope(i);
+        end
+    end
 end
 
 tt = toc;
