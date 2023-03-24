@@ -50,7 +50,9 @@ The code assumes that data are organized in the following way:
     - mask.nii.gz
     - noisemap.nii.gz
 
-The OUTPUT of the analysis will be stored in a new folder 'SANDI_Output' within the corresponding 'Dataset_xxx' folder
+The OUTPUT of the analysis will be stored in a new folder 'SANDI_Output' within the corresponding 'Dataset_xxx' folder. 
+
+REPORTS. If the flags "SANDIinput.DoTestPerformances" and "SANDIinput.diagnostics" are set to '1' (we recommend to always do so), then two HTML reports are also generated for assessing the performances of the Machine Learning estimation. These reports (named "report.html") can be found one in "StudyMainFolder -> Report_ML_Training_Performance" folder and one in each "Dataset_xxx -> SANDI_Output -> SANDIreport" folder. 
 
 ## Citation
 If you use SANDI Matlab Toolbox, please remember to cite our main SANDI work:
