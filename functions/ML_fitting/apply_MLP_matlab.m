@@ -24,9 +24,9 @@ if method == 1
         net = Mdl{j};
         mpgMean(:,:,j) = net(signal');
         if MLdebias==1
-            for i = [1,3,5]
-                mpgMean(:,i,j) = (mpgMean(:,i,j) - Intercept(i,j))./Slope(i,j);
-            end
+        for i = [1,3,5]
+            mpgMean(:,i,j) = (mpgMean(:,i,j) - Intercept(i,j))./Slope(i,j);
+        end
         end
     end
         

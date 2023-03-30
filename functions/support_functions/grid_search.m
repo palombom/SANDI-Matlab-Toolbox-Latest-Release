@@ -34,11 +34,14 @@ Sexample = f(xtmp(1,:), x);
 
 S = zeros(size(xtmp,1), numel(Sexample));
 
+
+
 parfor i = 1:size(xtmp,1)
 
     S(i,:) = f(xtmp(i,:), x);
 
 end
+
 
 idxmin = zeros(size(y,1), 1);
 

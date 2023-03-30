@@ -30,9 +30,9 @@ smalldel = model.smalldel;
 
 params = zeros(Nset, Nparams);
 
- T = drchrnd([1 1 1], Nset);
+ T = drchrnd([1 1 1], round(Nset));
  params(:,1:2) = T(:,1:2);
-   
+
 % Sample the other model paramters from a uniform distribution
 
   for i = 3:Nparams
@@ -48,6 +48,10 @@ fball = @(p,x) exp(-p.*x);
 f = @(p, x, costheta) p(1).*fstick(p(3),x,costheta) + ...
     p(2).*fsphere(p(4),x) + ...
     (1 - p(1) - p(2)).*fball(p(5),x);
+
+% f = @(p, x, costheta) p(1).*(p(2).*fstick(p(3),x,costheta) + ...
+%     (1 - p(2)).*fsphere(p(4),x)) + ...
+%     (1 - p(1)).*fball(p(5),x);
 
 % Load bvals and bvecs
 

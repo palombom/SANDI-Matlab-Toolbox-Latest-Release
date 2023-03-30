@@ -13,4 +13,5 @@ mu = 1.2533 .* sig .* K;
 nanlocs = find(isnan(mu) | ~isfinite(mu));
 mu(nanlocs) = nu(nanlocs);
 mu = mu./mu(1); % Provide signal normilized by the b=0 signal
+
 end

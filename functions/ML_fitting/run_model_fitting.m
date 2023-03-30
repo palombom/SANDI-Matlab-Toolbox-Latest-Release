@@ -13,6 +13,7 @@ function [] = run_model_fitting(SANDIinput)
 mask_data = SANDIinput.mask_filename ;
 output_folder = SANDIinput.output_folder ;
 Mdl = SANDIinput.Mdl ;
+trainedML = SANDIinput.trainedML;
 MLmodel = SANDIinput.MLmodel ;
 model = SANDIinput.model ;
 diagnostics = SANDIinput.diagnostics ;
@@ -63,6 +64,8 @@ signal(isnan(signal)) = 0; signal(isinf(signal)) = 0; signal(signal<0) = 0;
 
 if isempty(MLmodel), MLmodel='RF'; end
 
+MLdebias = SANDIinput.MLdebias;
+
 switch MLmodel
 
     case 'RF'
@@ -73,7 +76,7 @@ switch MLmodel
         % --- Using Matlab
 
         disp('Applying the Random Forest...')
-        mpgMean = apply_RF_matlab(signal, Mdl);
+        mpgMean = apply_RF_matlab(signal, trainedML, MLdebias);
 
     case 'MLP'
 
@@ -84,17 +87,14 @@ switch MLmodel
         % --- Using Matlab
 
         disp('Applying the MLP...')
-        mpgMean = apply_MLP_matlab(signal, Mdl);
+        mpgMean = apply_MLP_matlab(signal, trainedML, MLdebias);
 
 end
+
 %% Calculate and save SANDI parametric maps
 
-% for pp = 1:size(Mdl,1)
-%             mpgMean(:,pp) = (mpgMean(:,pp) - SANDIinput.Correction.Intercept(pp,3))./SANDIinput.Correction.Slope(pp,3);
-% end
-
 names = {'fneurite', 'fsoma', 'Din', 'Rsoma', 'De', 'fextra', 'Rsoma_Low_fsoma_Filtered', 'Din_Low_fsoma_Filtered'};
-bounds = [0 1; 0 1; model.paramsrange(3:5,:).*1.2; 0 1];
+bounds = [0 0.7; 0 0.7; model.paramsrange(3:5,:).*1; 0 1];
 
 fneu = mpgMean(:,1);
 fneu(fneu<0) = 0;
@@ -111,61 +111,147 @@ fextra = fe ./ (fneu + fsom + fe);
 
 disp('Saving SANDI parametric maps')
 
-if diagnostics==1
-    h = figure('Name','SANDI maps for a representative slice'); hold on
-end
-
-for i=1:size(mpgMean,2)+3
-
-    itmp = zeros(sx*sy*sz,1);
-
-    if i==1
-        itmp(mask==1) = fneurite;
-    elseif i==2
-        itmp(mask==1) = fsoma;
-    elseif i==size(mpgMean,2)+1
-        itmp(mask==1) = fextra;
-    elseif i==size(mpgMean,2)+2
-        Rsoma_tmp = mpgMean(:,4);
-        Rsoma_tmp(fsoma<=0.15) = 0;
-        itmp(mask==1) = Rsoma_tmp;
-    elseif i==size(mpgMean,2)+3
-        Din_tmp = mpgMean(:,3);
-        Din_tmp(fneurite<0.10) = 0;
-        itmp(mask==1) = Din_tmp;
-    else
-        mpgMean(mpgMean(:,i)<0,i) = 0;
-        itmp(mask==1) = mpgMean(:,i);
+try
+    if diagnostics==1
+        r = SANDIinput.report{SANDIinput.subj_id};
     end
 
-    itmp = reshape(itmp,[sx sy sz]);
+    for i=1:size(mpgMean,2)+3
+
+        itmp = zeros(sx*sy*sz,1);
+
+        if i==1
+            itmp(mask==1) = fneurite;
+        elseif i==2
+            itmp(mask==1) = fsoma;
+        elseif i==size(mpgMean,2)+1
+            itmp(mask==1) = fextra;
+        elseif i==size(mpgMean,2)+2
+            Rsoma_tmp = mpgMean(:,4);
+            Rsoma_tmp(fsoma<=0.15) = 0;
+            itmp(mask==1) = Rsoma_tmp;
+        elseif i==size(mpgMean,2)+3
+            Din_tmp = mpgMean(:,3);
+            Din_tmp(fneurite<0.10) = 0;
+            itmp(mask==1) = Din_tmp;
+        else
+            mpgMean(mpgMean(:,i)<0,i) = 0;
+            itmp(mask==1) = mpgMean(:,i);
+        end
+
+        itmp = reshape(itmp,[sx sy sz]);
+
+        if diagnostics==1
+            if i<=size(mpgMean,2)+1
+                h = figure('Name',['SANDI ' names{i} ' map']); hold on
+                tmp = imtile(itmp);
+                imshow(tmp,bounds(i,:)), title(names{i}), colorbar, colormap parula
+
+                T = getframe(h);
+                imwrite(T.cdata, fullfile(output_folder , 'SANDIreport', ['SANDI ' names{i} ' map.tiff']))
+
+                r.section(['SANDI ' names{i} ' map']);
+                r.add_text(['The plot shows the SANDI ' names{i} ' map.']);
+                r.add_figure(gcf,['SANDI ' names{i} ' map. Units are um for maps indicating radius and um^2/ms for maps indicating diffusivities.'],'left');
+                r.end_section();
+                
+
+                savefig(h, fullfile(output_folder, 'SANDIreport', ['SANDI ' names{i} ' map.fig']));
+                close(h);
+            end
+        end
+
+        nifti_struct.img = itmp;
+        nifti_struct.hdr.dime.dim(5) = size(nifti_struct.img,4);
+        if size(nifti_struct.img,4)==1
+            nifti_struct.hdr.dime.dim(1) = 3;
+        else
+            nifti_struct.hdr.dime.dim(1) = 4;
+        end
+        nifti_struct.hdr.dime.datatype = 16;
+        nifti_struct.hdr.dime.bitpix = 32;
+
+        save_untouch_nii(nifti_struct,fullfile(output_folder, ['SANDI-fit_' names{i} '.nii.gz']));
+        disp(['  - ' output_folder '/SANDI-fit_' names{i} '.nii.gz'])
+
+    end
 
     if diagnostics==1
-        if i<=size(mpgMean,2)+1
-            [~, ~, slices, ~] = size(itmp);
-            slice_to_show = round(slices/2);
-            slice_to_show(slice_to_show==0) = 1;
-            subplot(2,3,i), hold on, imshow(itmp(:,:,slice_to_show), bounds(i,:)), title(names{i}), colorbar, colormap jet
+        r.close();
+    end
+    
+catch
+
+    if diagnostics==1
+        r = SANDIinput.report{SANDIinput.subj_id};
+        h = figure('Name','SANDI maps for a representative slice'); hold on
+    end
+
+    for i=1:size(mpgMean,2)+3
+
+        itmp = zeros(sx*sy*sz,1);
+
+        if i==1
+            itmp(mask==1) = fneurite;
+        elseif i==2
+            itmp(mask==1) = fsoma;
+        elseif i==size(mpgMean,2)+1
+            itmp(mask==1) = fextra;
+        elseif i==size(mpgMean,2)+2
+            Rsoma_tmp = mpgMean(:,4);
+            Rsoma_tmp(fsoma<=0.15) = 0;
+            itmp(mask==1) = Rsoma_tmp;
+        elseif i==size(mpgMean,2)+3
+            Din_tmp = mpgMean(:,3);
+            Din_tmp(fneurite<0.10) = 0;
+            itmp(mask==1) = Din_tmp;
+        else
+            mpgMean(mpgMean(:,i)<0,i) = 0;
+            itmp(mask==1) = mpgMean(:,i);
         end
+
+        itmp = reshape(itmp,[sx sy sz]);
+
+        if diagnostics==1
+            if i<=size(mpgMean,2)+1
+                [~, ~, slices, ~] = size(itmp);
+                slice_to_show = round(slices/2);
+                slice_to_show(slice_to_show==0) = 1;
+                subplot(2,3,i), hold on, imshow(itmp(:,:,slice_to_show), bounds(i,:)), title(names{i}), colorbar, colormap parula
+            end
+        end
+
+        nifti_struct.img = itmp;
+        nifti_struct.hdr.dime.dim(5) = size(nifti_struct.img,4);
+        if size(nifti_struct.img,4)==1
+            nifti_struct.hdr.dime.dim(1) = 3;
+        else
+            nifti_struct.hdr.dime.dim(1) = 4;
+        end
+        nifti_struct.hdr.dime.datatype = 16;
+        nifti_struct.hdr.dime.bitpix = 32;
+
+        save_untouch_nii(nifti_struct,fullfile(output_folder, ['SANDI-fit_' names{i} '.nii.gz']));
+        disp(['  - ' output_folder '/SANDI-fit_' names{i} '.nii.gz'])
+
     end
 
-    nifti_struct.img = itmp;
-    nifti_struct.hdr.dime.dim(5) = size(nifti_struct.img,4);
-    if size(nifti_struct.img,4)==1
-        nifti_struct.hdr.dime.dim(1) = 3;
-    else
-        nifti_struct.hdr.dime.dim(1) = 4;
-    end
-    nifti_struct.hdr.dime.datatype = 16;
-    nifti_struct.hdr.dime.bitpix = 32;
+    if diagnostics==1
 
-    save_untouch_nii(nifti_struct,fullfile(output_folder, ['SANDI-fit_' names{i} '.nii.gz']));
-    disp(['  - ' output_folder '/SANDI-fit_' names{i} '.nii.gz'])
+        T = getframe(h);
+        imwrite(T.cdata, fullfile(output_folder , 'SANDIreport', 'SANDI_Maps.tiff'))
+
+        r.section('SANDI maps for a representative slice');
+        r.add_text('The plot shows the SANDI parametetric maps for a representative slice.');
+        r.add_figure(gcf,'SANDI parametetric maps for a representative slice','left');
+        r.end_section();
+        r.close();
+
+        savefig(h, fullfile(output_folder, 'SANDIreport', 'SANDI_Maps.fig'));
+        close(h);
+    end
 
 end
-
-savefig(h, fullfile(output_folder, 'SANDI_Maps.fig'));
-close(h);
 
 end
 

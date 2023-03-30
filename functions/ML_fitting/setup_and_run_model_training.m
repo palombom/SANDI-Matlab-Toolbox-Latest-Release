@@ -77,8 +77,7 @@ sigma_mppca = sigma_mppca_sampled;
 
 if diagnostics==1
 
-    SANDIinput.report = report_generator([], fullfile(SANDIinput.StudyMainFolder,'Report_ML_Training_Performance'));
-    r = SANDIinput.report;
+    r = report_generator([], fullfile(SANDIinput.StudyMainFolder,'Report_ML_Training_Performance'));
     r.open();
 
     h = figure('Name','Distribution of noise variances');
@@ -86,6 +85,9 @@ if diagnostics==1
     histogram(sigma_mppca_sampled, 100), title('From the MPPCA noisemap'), hold on
     subplot(1,2,2)
     histogram(sigma_SHresiduals_sampled, 100), title('From the residuals of SH fit.'), hold on
+    
+    T = getframe(h);
+    imwrite(T.cdata, fullfile(SANDIinput.StudyMainFolder , 'Report_ML_Training_Performance', 'Distribution_of_noise_variances.tiff'))
 
     r.section('Distribution of Noise Variances');
     r.add_text('The plot shows the distribution of noise variances used to inject noise to simulated noiseless signals for training.');
@@ -102,7 +104,7 @@ model.sigma_SHresiduals = sigma_SHresiduals;
 model.delta = delta;
 model.smalldel = smalldel;
 model.Dsoma = Dsoma;
-model.paramsrange = [0 1; 0 1; Dsoma/6 Din_UB; 3 Rsoma_UB; Dsoma/6 De_UB];
+model.paramsrange = [0 1; 0 1; Dsoma/6 Din_UB; 1 Rsoma_UB; Dsoma/6 De_UB];
 model.Nparams = size(model.paramsrange,1);
 model.boost = FittingMethod;
 
@@ -132,6 +134,10 @@ fball = @(p,x) exp(-p.*x);
 ffit = @(p,x) cos(p(1)).^2.*fstick(p(3),x) + ...
     (1-cos(p(1)).^2).*cos(p(2)).^2.*fsphere(p(4),x) + ...
     (1 - cos(p(1)).^2 - (1-cos(p(1)).^2).*cos(p(2)).^2).*fball(p(5),x);
+
+% ffit = @(p,x) p(1).*(p(2).*fstick(p(3),x) + ...
+%     (1 - p(2)).*fsphere(p(4),x)) + ...
+%     (1 - p(1)).*fball(p(5),x);
 
 model.fmodel = ffit;
 
@@ -192,9 +198,9 @@ switch MLmodel
         n_trees = 200;
         disp(['* Training a Random Forest with ' num2str(n_trees) ' trees for each model parameter...'])
 
-        Mdl = train_RF_matlab((database_train_noisy), params_train, n_trees);
+        trainedML = train_RF_matlab((database_train_noisy), params_train, n_trees);
         train_perf = cell(5,1);
-
+        Mdl = trainedML.Mdl;
         for i=1:5
             train_perf{i} = oobError(Mdl{i});
         end
@@ -207,24 +213,32 @@ switch MLmodel
         % --- Using Matlab
         n_MLPs = 1; % NOTE: training will take n_MLPs times longer! Training is performed using n_MLPs randomly initiailized for each model parameter. The final prediciton is the average prediciton among the n_MLPS. This shuold mitigate issues with local minima during training according to the "wisdom of crowd" principle.
         n_layers = 3;
-        n_units = 30; % 5*min(size(database_train,1),size(database_train,2)); % Recommend network between 3 x number of b-shells and 5 x number of b-shells
+        n_units = 30; %3*min(size(database_train_noisy,1),size(database_train_noisy,2)); % Recommend network between 3 x number of b-shells and 5 x number of b-shells
 
         disp(['* Training ' num2str(n_MLPs) ' MLP(s) with ' num2str(n_layers) ' hidden layer(s) and ' num2str(n_units) ' units per layer for each model parameter...'])
 
-        [Mdl, train_perf] = train_MLP_matlab(database_train_noisy, params_train, n_layers, n_units, n_MLPs);
-
+        trainedML = train_MLP_matlab(database_train_noisy, params_train, n_layers, n_units, n_MLPs);
+        train_perf = trainedML.training_performances;
         % save([output_folder '/trained_MLPmodel.mat'], 'Mdl', '-v7.3')
 
 end
 
+Mdl = trainedML.Mdl;
+
+SANDIinput.Slope_train=trainedML.Slope;
+SANDIinput.Intercept_train = trainedML.Intercept;
+
 SANDIinput.model = model;
 SANDIinput.Mdl = Mdl;
-
+SANDIinput.trainedML = trainedML;
+SANDIinput.database_train_noisy = database_train_noisy;
+SANDIinput.params_train = params_train;
 SANDIinput.train_perf = train_perf;
+
+MLdebias = SANDIinput.MLdebias;
 
 %% Compare performances of ML and NLLS fitting on unseen testdata
 if DoTestPerformances==1
-
 
     rng(123);
     model.Nset = 2.5e3;
@@ -244,7 +258,7 @@ if DoTestPerformances==1
             % --- Using Matlab
 
             disp('Applying the Random Forest...')
-            MLpredictions = apply_RF_matlab((database_test_noisy), Mdl);
+            MLpredictions = apply_RF_matlab((database_test_noisy), trainedML, MLdebias);
 
         case 'MLP'
 
@@ -255,7 +269,7 @@ if DoTestPerformances==1
             % --- Using Matlab
 
             disp('Applying the MLP...')
-            MLpredictions = apply_MLP_matlab(database_test_noisy, Mdl);
+            MLpredictions = apply_MLP_matlab(database_test_noisy, trainedML, MLdebias);
 
     end
 
@@ -284,10 +298,15 @@ if DoTestPerformances==1
 
     parfor i = 1:size(database_test_noisy,1)
 
+        try
         % Assumes Rician noise and fix the sigma of noise
         bestest_NLLS(i,:) = lsqcurvefit(@(p,x) f_rm([p(1), p(2), p(3), p(4), p(5), sigma_mppca_test(i)],x), xini0(i,:), bvals, database_test_noisy(i,:), lb, ub, options);
         bestest_NLLS_noisy(i,:) = lsqcurvefit(@(p,x) f_rm([p(1), p(2), p(3), p(4), p(5), sigma_mppca_test(i)],x), xini(i,:), bvals, database_test_noisy(i,:), lb, ub, options);
 
+        catch
+        bestest_NLLS(i,:) = nan;
+        bestest_NLLS_noisy(i,:) = nan;
+        end
     end
 
     % Convert fitted variables to model parameters
@@ -561,6 +580,7 @@ if DoTestPerformances==1
 
         savefig(h, fullfile(SANDIinput.StudyMainFolder , 'Report_ML_Training_Performance', 'Error_vs_model_parameter_GT.fig'));
         close(h);
+        r.close();
 
     end
 end

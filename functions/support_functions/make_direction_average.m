@@ -69,7 +69,10 @@ S0mean_vec = S0mean_vec(mask==1);
 
 % Identify b-shells and direction-average per shell
 estimated_sigma = [];
+Ndirs_per_shell = zeros(1, numel(bunique));
 for i=1:numel(bunique)
+    Ndirs_per_shell(i) = sum(bvals==bunique(i));
+
     if i==1
 
         Save(:,:,:,i) = S0mean;
@@ -86,6 +89,7 @@ for i=1:numel(bunique)
 
             disp(['   - Calculating powder average signal by estimating the zero-order SH - shell ' num2str(i-1) ' of ' num2str(numel(bunique)-1)])
             dirs = bvecs(:,bvals==bunique(i))';
+
             y_tmp = I(:,:,:,bvals==bunique(i));
             y_tmp = reshape(y_tmp,[sx*sy*sz, size(y_tmp,4)])';
             y = y_tmp(:,mask==1);
@@ -144,19 +148,35 @@ SANDIinput.sigma_SHresiduals = [SANDIinput.sigma_SHresiduals, sigma_SHresiduals]
 %ProtocolToScheme(protocol, [outputfolder '/diravg.scheme'])
 
 if diagnostics==1
-    
+        
+    r = SANDIinput.report{SANDIinput.subj_id};
+    r.open();
+
     h = figure('Name', 'Spherical mean signal'); hold on
    
     [~, ~, slices, ~] = size(Save);
     slice_to_show = round(slices/2);
     slice_to_show(slice_to_show==0) = 1;
     img_to_show = squeeze(Save(:,:,slice_to_show,:));
+    
+    try 
+
+            tmp = imtile(squeeze(Save(:,:,slice_to_show,:)));
+    imshow(tmp, [0 0.7]), colorbar
+    catch
     for vv = 1:size(img_to_show,3)
         subplot(4,4,vv), imshow(img_to_show(:,:,vv),[0 0.7]), colorbar
-    %tmp = imtile(squeeze(Save(:,:,slice_to_show,:)));
-    %imshow(tmp, [0 0.7]), colorbar
+
     end
-    savefig(h, fullfile(output_folder, 'Spherical_mean_signal.fig'));
+    end
+    T = getframe(h);
+    imwrite(T.cdata, fullfile(output_folder , 'SANDIreport', 'Spherical_mean_signal.tiff'))
+
+    r.section(['Direction averaged signal of dataset: ' data_filename]);
+    r.add_text(['The plot shows the direction averaged signal for each b value, normalized by the b=0 image. The dataset has ' num2str(numel(bunique)) ' b values: ' num2str(bunique) ' in s/mm^2, with ' num2str(Ndirs_per_shell) ' number of directions. The Delta is ' num2str(SANDIinput.delta) ' ms; the smalldelta is ' num2str(SANDIinput.smalldel) ' ms; the diffusion time is ' num2str(SANDIinput.delta - SANDIinput.smalldel/3) ' ms.']);
+    r.add_figure(gcf,['Normalized direction averaged signal for each b value: ' num2str(bunique) ' in s/mm^2.'],'left');
+    r.end_section();
+    savefig(h, fullfile(output_folder, 'SANDIreport', 'Spherical_mean_signal.fig'));
     close(h);
 
 end
