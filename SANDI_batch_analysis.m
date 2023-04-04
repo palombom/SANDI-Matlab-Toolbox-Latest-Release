@@ -82,6 +82,8 @@ SANDIinput.MLdebias = 1; % can be '0' or '1'. When '1', it will estimate slope a
 
 SANDIinput.FWHM = 0.001; % size of the 3D Gaussian smoothing kernel. If needed, this smooths the input data before analysis.
 
+SANDIinput.UseDirectionAveraging = 1; % It calculates the powder-averaged signal as aritmetic mean over the directions instead of using the order zero SH.
+
 SANDIinput.DoTestPerformances = 1; % If '1' then it compares the performances of ML estimation with NLLS estimation on unseen simulated signals and write HTML report
 SANDIinput.diagnostics = 1; % can be '0' or '1'. When '1', figures will be plotted to help checking the results
 
