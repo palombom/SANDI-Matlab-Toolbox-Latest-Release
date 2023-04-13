@@ -43,7 +43,7 @@ The function "SANDI_batch_analysis" represents the core of the toolbox. It perfo
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
-        ...
+        - ...
         - ses-n
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
@@ -63,7 +63,7 @@ The function "SANDI_batch_analysis" represents the core of the toolbox. It perfo
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
-        ...
+        - ...
         - ses-n
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
@@ -84,7 +84,7 @@ The function "SANDI_batch_analysis" represents the core of the toolbox. It perfo
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
-        ...
+        - ...
         - ses-n
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
