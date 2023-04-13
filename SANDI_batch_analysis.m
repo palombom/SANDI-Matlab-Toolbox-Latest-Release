@@ -107,14 +107,12 @@ disp('*****   SANDI analysis using Machine Learning based fitting method   *****
 SANDIinput = InitializeSANDIinput(ProjectMainFolder, Delta, smalldelta);
 
 %% STEP 1 - Preprocess the data: calculate the spherical mean signal and estimate noise distributions
-SANDIinput = ProcessAllDatasets(SANDIinput); % Start processing all the datasets, one by one
+SANDIinput = ProcessAllDatasets(SANDIinput); % Process all the datasets, one by one
 
 %% STEP 2 - Train the Machine Learning (ML) model
 SANDIinput = TrainMachineLearningModel(SANDIinput);
 
 %% STEP 3 - SANDI fit each subject
-% Here each subject can be preprocessed to compute the direction averaged
-% signal and then used for SANDI model estimation by inserting the code below within a for loop over each subject
-SANDIinput = AnalyseAllDatasets(SANDIinput);
+SANDIinput = AnalyseAllDatasets(SANDIinput); % Analyse all the datasets, one by one
 
 end
