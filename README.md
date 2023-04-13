@@ -21,38 +21,82 @@ If you use Linux or MacOS:
 ```
 $ git clone https://github.com/palombom/SANDI-Matlab-Toolbox-Latest-Release.git 
 ```
-4. The main script is called "SANDI_batch_analysis" and it explains how to analyse one or more datasets with the SANDI model. 
+4. The main function is called "SANDI_batch_analysis" and it analyses one or more datasets with the SANDI model. 
 5. You should now be able to use the code. 
 
 ## Usage
-The script "SANDI_batch_analysis" shows how to use the toolbox to perform the SANDI analysis on one or more datasets. 
+The function "SANDI_batch_analysis" represents the core of the toolbox. It performs the SANDI analysis on one or more datasets. It assumes that data are organized following the BIDS standard:
 
-The code assumes that data are organized in the following way:
+- ProjectMainFolder
+  - derivatives
+    - preprocessed
+      - sub-01
+        - ses-01
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
+        - ses-02
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
+        ...
+        - ses-n
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
+      - sub-02
+        - ses-01
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
+        - ses-02
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
+        ...
+        - ses-n
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
+      - ...
+      - sub-n
+        - ses-01
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
+        - ses-02
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
+        ...
+        - ses-n
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
 
-- StudyMainFolder
-  - Dataset_1
-    - dwi.nii.gz
-    - bvals.bval
-    - bvecs.bvec
-    - mask.nii.gz
-    - noisemap.nii.gz
-  - Dataset_2
-    - dwi.nii.gz
-    - bvals.bval
-    - bvecs.bvec
-    - mask.nii.gz
-    - noisemap.nii.gz
-  - ...
-  - Dataset_n
-    - dwi.nii.gz
-    - bvals.bval
-    - bvecs.bvec
-    - mask.nii.gz
-    - noisemap.nii.gz
+**INPUT** to the "SANDI_batch_analysis" are: the 'ProjectMainFolder', alongside the gradient pulse separation 'Delta' and duration 'smalldelta' in ms (milliseconds). 
 
-The **OUTPUT** of the analysis will be stored in a new folder 'SANDI_Output' within the corresponding 'Dataset_xxx' folder. 
+**OUTPUT** of the analysis will be stored in a new folder 'ProjectMainFolder -> derivatives -> SANDI_analysis -> sub-XXX -> ses-XXX -> SANDI_Output' for each subject and session.
 
-**REPORTS** - If the flags "SANDIinput.DoTestPerformances" and "SANDIinput.diagnostics" are set to '1' (we recommend to always do so), then two HTML reports are also generated for assessing the performances of the Machine Learning estimation. These reports (named "report.html") can be found one in "StudyMainFolder -> Report_ML_Training_Performance" folder and one in each "Dataset_xxx -> SANDI_Output -> SANDIreport" folder. 
+**REPORTS** - If the flags "SANDIinput.DoTestPerformances" and "SANDIinput.diagnostics" are set to '1' (we recommend to always do so), then two HTML reports are also generated for assessing the performances of the Machine Learning estimation. These reports (named "report.html") can be found one in "ProjectMainFolder -> Report_ML_Training_Performance" folder and one in each "ProjectMainFolder -> derivatives -> SANDI_analysis -> sub-XXX -> ses-XXX -> SANDI_Output -> SANDIreport" folder. 
 
 ## Citation
 If you use SANDI Matlab Toolbox, please remember to cite our main SANDI work:
