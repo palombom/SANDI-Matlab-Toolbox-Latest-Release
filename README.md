@@ -23,7 +23,7 @@ If you use Linux or MacOS:
 ```
 $ git clone https://github.com/palombom/SANDI-Matlab-Toolbox-Latest-Release.git 
 ```
-4. Add the SANDI-Matlab-Toolbox-Latest-Release folder and subfolder to your Matlab path list. The main function is called "SANDI_batch_analysis" and it analyses one or more datasets with the SANDI model. 
+4. Add the SANDI-Matlab-Toolbox-Latest-Release folder and subfolders to your Matlab path list. The main function is called "SANDI_batch_analysis" and it analyses one or more datasets with the SANDI model. 
 5. You should now be able to use the code. 
 
 ## Usage
