@@ -23,43 +23,17 @@ If you use Linux or MacOS:
 ```
 $ git clone https://github.com/palombom/SANDI-Matlab-Toolbox-Latest-Release.git 
 ```
-4. The main function is called "SANDI_batch_analysis" and it analyses one or more datasets with the SANDI model. 
+4. Add the SANDI-Matlab-Toolbox-Latest-Release folder and subfolder to your Matlab path list. The main function is called "SANDI_batch_analysis" and it analyses one or more datasets with the SANDI model. 
 5. You should now be able to use the code. 
 
 ## Usage
-The function "SANDI_batch_analysis" represents the core of the toolbox. It performs the SANDI analysis on one or more datasets. It assumes that data are organized following the BIDS standard:
+The function "SANDI_batch_analysis" represents the core of the toolbox. It performs the SANDI analysis on one or more datasets. It assumes that data are organized following the BIDS standard. Create a single main folder, e.g. 'ProjectMainFolder' per group and strictly use the structure:  'ProjectMainFolder/derivatives/preprocessed/sub-01/ses-01' for the dataset corresponding to the first subject and the first session of this subject. Generalize the structure to n subjects and n sessions, as illustrated below. In each of the folders 'ProjectMainFolder/derivatives/preprocessed/sub-XXX/ses-YYY' data must be named making sure that they end as explained below (including the file extension!):
 
 - ProjectMainFolder
   - derivatives
     - preprocessed
       - sub-01
         - ses-01
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
-        - ses-02
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
-        - ...
-        - ses-n
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
-      - sub-02
-        - ses-01
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
-        - ses-02
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
@@ -80,12 +54,6 @@ The function "SANDI_batch_analysis" represents the core of the toolbox. It perfo
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
-        - ses-02
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
         - ...
         - ses-n
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
@@ -98,7 +66,9 @@ The function "SANDI_batch_analysis" represents the core of the toolbox. It perfo
 
 **OUTPUT** of the analysis will be stored in a new folder 'ProjectMainFolder -> derivatives -> SANDI_analysis -> sub-XXX -> ses-XXX -> SANDI_Output' for each subject and session.
 
-**REPORTS** - If the flags "SANDIinput.DoTestPerformances" and "SANDIinput.diagnostics" are set to '1' (we recommend to always do so), then two HTML reports are also generated for assessing the performances of the Machine Learning estimation. These reports (named "report.html") can be found one in "ProjectMainFolder -> Report_ML_Training_Performance" folder and one in each "ProjectMainFolder -> derivatives -> SANDI_analysis -> sub-XXX -> ses-XXX -> SANDI_Output -> SANDIreport" folder. 
+**REPORT** - A report of the steps performed is displaied in the matlab command window and saved in the txt file 'SANDI_analysis_LogFile.txt' within the 'ProjectMainFolder' folder. 
+
+**TEST PERFORMANCE** If the flags "SANDIinput.DoTestPerformances" and "SANDIinput.diagnostics" are set to '1' (we recommend to always do so the first time you run the toolbox for a study), then the toolbox will run a series of tests to quantify the performance of the model fitting, given the acquisition protocol used and the noise distributions of the datasets. This includes: test of SANDI model parameters cross-correlations; accuracy and precision of each model parameter estimation; bias due to unaccounted inter-compartmental exchange; sensitivity analysis (based on a nominal change of model parameters of 10%). Images of the output of the performance analysis are saved in "ProjectMainFolder -> Report_ML_Training_Performance" folder and in each "ProjectMainFolder -> derivatives -> SANDI_analysis -> sub-XXX -> ses-XXX -> SANDI_Output -> SANDIreport" folders. 
 
 ## Citation
 If you use SANDI Matlab Toolbox, please remember to cite our main SANDI work:
