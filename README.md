@@ -27,7 +27,9 @@ $ git clone https://github.com/palombom/SANDI-Matlab-Toolbox-Latest-Release.git
 5. You should now be able to use the code. 
 
 ## Usage
-The function "SANDI_batch_analysis" represents the core of the toolbox. It performs the SANDI analysis on one or more datasets. It assumes that data are organized following the BIDS standard. Create a single main folder, e.g. 'ProjectMainFolder' per group and strictly use the structure:  'ProjectMainFolder/derivatives/preprocessed/sub-01/ses-01' for the dataset corresponding to the first subject and the first session of this subject. Generalize the structure to n subjects and n sessions, as illustrated below. In each of the folders 'ProjectMainFolder/derivatives/preprocessed/sub-XXX/ses-YYY' data must be named making sure that they end as explained below (including the file extension!):
+The function "SANDI_batch_analysis" represents the core of the toolbox. It performs the SANDI analysis on one or more datasets. It assumes that data are organized following the BIDS standard. 
+
+Create a single main folder, e.g. 'ProjectMainFolder' per group and strictly use the structure:  '**ProjectMainFolder/derivatives/preprocessed/sub-XXX/ses-YYY**' for the dataset corresponding to the subject number XXX and the session number YYY of this subject. Generalize the structure to n subjects and n sessions, as illustrated below. In each of the folders 'ProjectMainFolder/derivatives/preprocessed/sub-XXX/ses-YYY' **data must be named making sure that they end as explained below** (including the file extension!):
 
 - ProjectMainFolder
   - derivatives
