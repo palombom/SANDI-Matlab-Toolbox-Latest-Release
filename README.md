@@ -1,6 +1,6 @@
 # SANDI Matlab Toolbox: Latest Release
 
-![SANDIToolbox_v2_Logo2](https://github.com/palombom/SANDI-Matlab-Toolbox-Latest-Release/assets/33546086/3d8bb4b3-0177-4dcc-9d50-77014ad96968)
+![icon_48](https://github.com/palombom/SANDI-Matlab-Toolbox-Latest-Release/assets/33546086/1b5e607f-b76f-45b5-a509-9eb15c436c24)
 
 This repository contains the latest release of the SANDI Matlab Toolbox.
 
