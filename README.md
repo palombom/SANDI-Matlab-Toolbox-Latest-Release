@@ -1,5 +1,7 @@
 # SANDI Matlab Toolbox: Latest Release
 
+![SANDIToolbox_v2_Logo2](https://github.com/palombom/SANDI-Matlab-Toolbox-Latest-Release/assets/33546086/3d8bb4b3-0177-4dcc-9d50-77014ad96968)
+
 This repository contains the latest release of the SANDI Matlab Toolbox.
 
 The "***SANDI (Soma And Neurite Density Imaging) Matlab Toolbox***" enables model-based estimation of MR signal fraction of brain cell bodies (of all cell types, from neurons to glia, namely soma) and cell projections (of all cell types, from dentrites and myelinated axons to glial processes, namely neurties ) as well as apparent MR cell body radius and intraneurite and extracellular apparent diffusivities from a suitable diffusion-weighted MRI acquisition using Machine Learning (see the original SANDI paper for model assumptions and acquisition requirements DOI: https://doi.org/10.1016/j.neuroimage.2020.116835).
