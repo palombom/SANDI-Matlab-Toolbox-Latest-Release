@@ -36,11 +36,11 @@ Create a single main folder, e.g. 'ProjectMainFolder' per group and strictly use
     - preprocessed
       - sub-01
         - ses-01
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc**_dwi.nii.gz**
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc**_dwi.bval**
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc**_dwi.bvec**
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc**_mask.nii.gz**
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc**_noisemap.nii.gz**
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
         - ...
         - ses-n
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
@@ -64,13 +64,24 @@ Create a single main folder, e.g. 'ProjectMainFolder' per group and strictly use
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
 
-**INPUT** to the "SANDI_batch_analysis" are: the 'ProjectMainFolder', alongside the gradient pulse separation 'Delta' and duration 'smalldelta' in ms (milliseconds). 
+**INPUT** to the "SANDI_batch_analysis" are: the 'ProjectMainFolder', alongside the gradient pulse separation 'Delta' and duration 'smalldelta' in ms (milliseconds) and the average SNR of the b=0 image. If a noisemap is provided (for example as estimated by the MrTrix3 funciton 'dwidenoise'), then the SNR is not needed and define SNR = [];  
 
 **OUTPUT** of the analysis will be stored in a new folder 'ProjectMainFolder -> derivatives -> SANDI_analysis -> sub-XXX -> ses-XXX -> SANDI_Output' for each subject and session.
 
 **REPORT** - A report of the steps performed is displaied in the matlab command window and saved in the txt file 'SANDI_analysis_LogFile.txt' within the 'ProjectMainFolder' folder. 
 
 **TEST PERFORMANCE** If the flags "SANDIinput.DoTestPerformances" and "SANDIinput.diagnostics" are set to '1' (we recommend to always do so the first time you run the toolbox for a study), then the toolbox will run a series of tests to quantify the performance of the model fitting, given the acquisition protocol used and the noise distributions of the datasets. This includes: test of SANDI model parameters cross-correlations; accuracy and precision of each model parameter estimation; bias due to unaccounted inter-compartmental exchange; sensitivity analysis (based on a nominal change of model parameters of 10%). Images of the output of the performance analysis are saved in "ProjectMainFolder -> Report_ML_Training_Performance" folder and in each "ProjectMainFolder -> derivatives -> SANDI_analysis -> sub-XXX -> ses-XXX -> SANDI_Output -> SANDIreport" folders. 
+
+## Recommended DWI acquisition
+We reccommend to follow the guidelines below to acquire data suitable to SANDI analysis, as much as possible, given the hardware limits of your MRI scanner:
+- 
+
+## Recommended preprocessing 
+To use the SANDI toolbox at its best, we recommend to follow the minimal preprocessing steps described below and based on fucntions implemented in MrTrix3 (https://www.mrtrix.org/) and FSL (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki):
+
+- Denoising using '**dwidenoise**' from MrTrix3 with the option -noise to save the estimated noisemap;
+- Gibbs ringing correction using '**mrdegibbs**' from MrTrix3;
+- Motion and eddy current correction using '**topup**' and '**eddy**' from FSL;
 
 ## Citation
 If you use SANDI Matlab Toolbox, please remember to cite our main SANDI work:
