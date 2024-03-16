@@ -64,7 +64,7 @@ Create a single main folder, e.g. 'ProjectMainFolder' per group and strictly use
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
 
-**INPUT** to the "SANDI_batch_analysis" are: the 'ProjectMainFolder', alongside the gradient pulse separation 'Delta' and duration 'smalldelta' in ms (milliseconds) and the average SNR of the b=0 image. If a noisemap is provided (for example as estimated by the MrTrix3 funciton 'dwidenoise'), then the SNR is not needed and define SNR = [];  
+**INPUT** to the "SANDI_batch_analysis" are: the 'ProjectMainFolder', alongside the gradient pulse separation 'Delta' and duration 'smalldelta' in ms (milliseconds) and the average SNR of the b=0 image. If a noisemap is provided (for example as estimated by the MrTrix3 funciton 'dwidenoise'), then the SNR is not needed and use SNR = [];  
 
 **OUTPUT** of the analysis will be stored in a new folder 'ProjectMainFolder -> derivatives -> SANDI_analysis -> sub-XXX -> ses-XXX -> SANDI_Output' for each subject and session.
 
