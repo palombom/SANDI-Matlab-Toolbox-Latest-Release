@@ -74,10 +74,14 @@ Create a single main folder, e.g. 'ProjectMainFolder' per group and strictly use
 
 ## Recommended DWI acquisition
 We reccommend to follow the guidelines below to acquire data suitable to SANDI analysis, as much as possible, given the hardware limits of your MRI scanner:
-- 
+
+- Acquire **at least 5 b-shells, with 2 at b-values > 3000 s/mm^2**. We recommend to follow the examples and guidelines regarding number of b-shells and number of directions per b-shells we published in https://doi.org/10.1002/hbm.26416 and https://doi.org/10.1016/j.mri.2022.07.015;
+- **Keep the TE and TR values exactly the same for each b-shell**; try to keep the TE the shortest possible allowing the maximum b values chosen and try to keep TR >=3000 ms;
+- **Keep the gradient pulse duration (smalldelta) and separation (Delta) the shortest possible**;
+- **Avoid partial fourier**; set it to 'off' or unity, if possible
 
 ## Recommended preprocessing 
-To use the SANDI toolbox at its best, we recommend to follow the minimal preprocessing steps described below and based on fucntions implemented in MrTrix3 (https://www.mrtrix.org/) and FSL (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki):
+To use the SANDI toolbox at its best, we recommend to follow the minimal preprocessing steps described below and based on functions implemented in MrTrix3 (https://www.mrtrix.org/) and FSL (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki):
 
 - Denoising using '**dwidenoise**' from MrTrix3 with the option -noise to save the estimated noisemap;
 - Gibbs ringing correction using '**mrdegibbs**' from MrTrix3;
