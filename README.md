@@ -36,11 +36,11 @@ Create a single main folder, e.g. 'ProjectMainFolder' per group and strictly use
     - preprocessed
       - sub-01
         - ses-01
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bval
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.bvec
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_mask.nii.gz
-          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_noisemap.nii.gz
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc**_dwi.nii.gz**
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc**_dwi.bval**
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc**_dwi.bvec**
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc**_mask.nii.gz**
+          - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc**_noisemap.nii.gz**
         - ...
         - ses-n
           - sub-<>_ses-<>_acq-<>_run-<>_desc-preproc_dwi.nii.gz
