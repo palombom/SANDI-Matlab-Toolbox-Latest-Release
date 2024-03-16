@@ -70,7 +70,7 @@ Create a single main folder, e.g. 'ProjectMainFolder' per group and strictly use
 
 **REPORT** A report of the steps performed is displaied in the matlab command window and saved in the txt file 'SANDI_analysis_LogFile.txt' within the 'ProjectMainFolder' folder. 
 
-**INITIALIZATION** The function "InitializeSANDIinput" initializa the SANDI toolbox using default options. Explore and edit this function if you would like to change them from the default ones, for example to perform performance analysis, as explained following. 
+**INITIALIZATION** The function "InitializeSANDIinput" initialize the SANDI toolbox using default options. Explore and edit this function if you would like to change them from the default ones, for example to perform performance analysis, as explained following. 
 
 **TEST PERFORMANCE** If the flags "SANDIinput.DoTestPerformances" and "SANDIinput.diagnostics" inside the function "InitializeSANDIinput" are set to '1' (we recommend to always do so the first time you run the toolbox for a study), then the toolbox will run a series of tests to quantify the performance of the model fitting, given the acquisition protocol used and the noise distributions of the datasets. This includes: test of SANDI model parameters cross-correlations; accuracy and precision of each model parameter estimation; bias due to unaccounted inter-compartmental exchange; sensitivity analysis (based on a nominal change of model parameters of 10%). Images of the output of the performance analysis are saved in "ProjectMainFolder -> Report_ML_Training_Performance" folder and in each "ProjectMainFolder -> derivatives -> SANDI_analysis -> sub-XXX -> ses-XXX -> SANDI_Output -> SANDIreport" folders. 
 
@@ -98,6 +98,11 @@ and our preclinical optimization:
 
 2. Andrada Ianuş, Joana Carvalho, Francisca F. Fernandes, Renata Cruz, Cristina Chavarrias, Marco Palombo, Noam Shemesh, "Soma and Neurite Density MRI (SANDI) of the in-vivo mouse brain and comparison with the Allen Brain Atlas", NeuroImage 2022, 254: 119135, ISSN 1053-8119, DOI: https://doi.org/10.1016/j.neuroimage.2022.119135.
 
+To guide your acquisition design, please remember to cite our main SANDI acquisition works:
+
+3. Kurt G. Schilling, Marco Palombo, Kristin P. O'Grady, Anna JE Combes, Adam W. Anderson, Bennett A. Landman, and Seth A. Smith. "Minimal number of sampling directions for robust measures of the spherical mean diffusion weighted signal: Effects of sampling directions, b-value, signal-to-noise ratio, hardware, and fitting strategy." Magnetic resonance imaging 2022, 94: 25-35, DOI: https://doi.org/10.1016/j.mri.2022.07.015
+
+4. Simona Schiavi, Marco Palombo, Domenico Zacà, Francesco Tazza, Caterina Lapucci, Lucio Castellan, Mauro Costagli, and Matilde Inglese. "Mapping tissue microstructure across the human brain on a clinical scanner with soma and neurite density image metrics." Human Brain Mapping 2023, 44(13): 4792-4811, DOI: https://doi.org/10.1002/hbm.26416
 
 ## License
 SANDI Matlab Toolbox is distributed under the BSD 2-Clause License (https://github.com/palombom/SANDI-Matlab-Toolbox/blob/main/LICENSE), Copyright (c) 2022 Cardiff University and University College London. All rights reserved.
