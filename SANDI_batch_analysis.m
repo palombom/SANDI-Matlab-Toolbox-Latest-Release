@@ -85,6 +85,10 @@ SANDIinput = ProcessAllDatasets(SANDIinput); % Process all the datasets, one by 
 %% STEP 2 - Train the Machine Learning (ML) model
 SANDIinput = TrainMachineLearningModel(SANDIinput); % trains the ML model on synthetic data
 
+%SANDIinput =
+%investigate_exchange_effectes_NEXI_SANDI_RicianNoise(SANDIinput); % Runs
+%tests to estimate the bias due to unaccounted exchange between SANDI
+%compartments, using NEXI model https://doi.org/10.1016/j.neuroimage.2022.119277
 %% STEP 3 - SANDI fit each subject
 SANDIinput = AnalyseAllDatasets(SANDIinput); % Analyse all the datasets, one by one
 

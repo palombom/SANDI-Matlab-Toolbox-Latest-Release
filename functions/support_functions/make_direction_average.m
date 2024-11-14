@@ -44,12 +44,6 @@ fprintf(SANDIinput.LogFileID, '   - Loading the data\n');
 tmp = load_untouch_nii(mask_filename);
 mask = double(tmp.img(:));
 
-if ~isempty(noisemap_mppca_filename)
-    tmp = load_untouch_nii(noisemap_mppca_filename);
-    tmp_img = double(tmp.img(:));
-    sigma_mppca = tmp_img(mask==1)';
-end
-
 tmp = load_untouch_nii(data_filename);
 I = double(abs(tmp.img));
 I = I.*tmp.hdr.dime.scl_slope + tmp.hdr.dime.scl_inter; % Rescale the data for slope and intercept
@@ -72,9 +66,35 @@ bvals = round(bvals/100).*100;
 bunique = unique(bvals);
 
 Save = zeros(sx, sy, sz, numel(bunique));
-S0mean = nanmean(double(I(:,:,:,bvals<=100)),4);
+S0mean = mean(double(I(:,:,:,bvals<=100)),4,'omitnan');
 S0mean_vec = S0mean(:);
 S0mean_vec = S0mean_vec(mask==1);
+
+if ~isempty(noisemap_mppca_filename)
+    tmp = load_untouch_nii(noisemap_mppca_filename);
+    sigma_mppca_map = double(tmp.img);
+    tmp_img = double(tmp.img(:));
+    sigma_mppca = tmp_img(mask==1)';
+
+    sigma_mppca_map_norm = sigma_mppca_map;
+    tmp.img = sigma_mppca_map_norm;
+    tmp.hdr.dime.dim(5) = size(tmp.img,4);
+    tmp.hdr.dime.dim(1) = 3;
+    tmp.hdr.dime.datatype = 16;
+    tmp.hdr.dime.bitpix = 32;
+    tmp_filename = fullfile(output_folder, 'noisemap_from_MPPCA.nii.gz');
+    save_untouch_nii(tmp, tmp_filename);
+    
+    sigma_mppca_map_norm = sigma_mppca_map./S0mean;
+    tmp.img = sigma_mppca_map_norm;
+    tmp.hdr.dime.dim(5) = size(tmp.img,4);
+    tmp.hdr.dime.dim(1) = 3;
+    tmp.hdr.dime.datatype = 16;
+    tmp.hdr.dime.bitpix = 32;
+    tmp_filename = fullfile(output_folder, 'noisemap_from_MPPCA_normalized.nii.gz');
+    save_untouch_nii(tmp, tmp_filename);
+    
+end
 
 % Identify b-shells and direction-average per shell
 estimated_sigma = [];
@@ -118,7 +138,7 @@ for i=1:numel(bunique)
         if SANDIinput.UseDirectionAveraging == 1
             disp('   - Calculating powder average signal as aritmetic mean over the directions. The SH fit is only used to estimate the variance of the gaussian noise');
             fprintf(SANDIinput.LogFileID, '   - Calculating powder average signal as aritmetic mean over the directions. The SH fit is only used to estimate the variance of the gaussian noise\n');
-            Save(:,:,:,i) = nanmean(I(:,:,:,bvals==bunique(i)), 4);
+            Save(:,:,:,i) = mean(I(:,:,:,bvals==bunique(i)), 4,'omitnan');
             
         else
             tmp_img = zeros(sx*sy*sz, 1);
@@ -129,7 +149,7 @@ for i=1:numel(bunique)
     end
 end
 
-sigma_SHresiduals = nanmean(estimated_sigma,1);
+sigma_SHresiduals = mean(estimated_sigma,1,'omitnan');
 
 Save = Save./S0mean;
 % Save the direction-averaged data in NIFTI
@@ -149,6 +169,16 @@ tmp.hdr.dime.datatype = 16;
 tmp.hdr.dime.bitpix = 32;
 noisemap_SHresiduals_filename = fullfile(output_folder, 'noisemap_from_SHfit.nii.gz');
 save_untouch_nii(tmp, noisemap_SHresiduals_filename)
+
+noisemap = zeros(sx*sy*sz, 1);
+noisemap(mask==1) = sigma_SHresiduals;
+tmp.img = reshape(noisemap,[sx sy sz])./S0mean; % We will use the normalized spherical mean signal
+tmp.hdr.dime.dim(5) = size(tmp.img,4);
+tmp.hdr.dime.dim(1) = 3;
+tmp.hdr.dime.datatype = 16;
+tmp.hdr.dime.bitpix = 32;
+tmp_filename = fullfile(output_folder, 'noisemap_from_SHfit_normalized.nii.gz');
+save_untouch_nii(tmp, tmp_filename)
 
 SANDIinput.Save = Save;
 SANDIinput.bunique = bunique;

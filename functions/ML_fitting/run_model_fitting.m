@@ -20,6 +20,7 @@ diagnostics = SANDIinput.diagnostics ;
 %% Load direction-averaging with gaussian smoothing given the provided FHWM
 
 img_data = fullfile(output_folder, 'diravg_signal.nii.gz'); % data to process: direction-averaged signals for each subject
+noisemap_data = fullfile(output_folder, 'noisemap_from_MPPCA_normalized.nii.gz');
 
 %% Load data
 
@@ -27,6 +28,12 @@ if ~isempty(mask_data)
     tmp = load_untouch_nii(mask_data);
     mask = double(tmp.img);
 end
+
+tmp = load_untouch_nii(noisemap_data);
+sigma_vec = tmp.img(:);
+
+disp(['Noisemap ' noisemap_data ' loaded:'])
+fprintf(SANDIinput.LogFileID,'Noisemap %s loaded:\n', noisemap_data);
 
 tmp = load_untouch_nii(img_data);
 nifti_struct = tmp;
@@ -71,6 +78,7 @@ if isempty(mask_data), mask = ones(sx,sy,sz); end
 ROI = reshape(I, [sx*sy*sz vol]);
 m = reshape(mask, [sx*sy*sz 1]);
 signal = (ROI(m==1,:));
+sigma = sigma_vec(m==1);
 
 % Remove nan or inf and impose that the normalised signal is >= 0
 signal(isnan(signal)) = 0; signal(isinf(signal)) = 0; signal(signal<0) = 0;
@@ -124,6 +132,43 @@ fneurite = fneu ./ (fneu + fsom + fe);
 fsoma = fsom ./ (fneu + fsom + fe);
 fextra = fe ./ (fneu + fsom + fe);
 
+% Predicting direction-averaged signal from SANDI model, e.g. useful to
+% calculate mse and quality of fit
+
+S = FromParamsToSignal_RicianBiased([fneurite(:) fsoma(:) mpgMean(:,3:5)], bvals, delta, smalldel, sigma);
+
+SANDI_predicted_diravg = zeros(sx*sy*sz,numel(bvals));
+SANDI_predicted_diravg(m==1,:) = S;
+SANDI_predicted_diravg = reshape(SANDI_predicted_diravg,[sx sy sz numel(bvals)]);
+nifti_struct_tmp = nifti_struct;
+nifti_struct_tmp.img = SANDI_predicted_diravg;
+nifti_struct_tmp.hdr.dime.dim(5) = size(nifti_struct_tmp.img,4);
+if size(nifti_struct_tmp.img,4)==1
+    nifti_struct_tmp.hdr.dime.dim(1) = 3;
+else
+    nifti_struct_tmp.hdr.dime.dim(1) = 4;
+end
+nifti_struct_tmp.hdr.dime.datatype = 16;
+nifti_struct_tmp.hdr.dime.bitpix = 32;
+save_untouch_nii(nifti_struct_tmp,fullfile(output_folder, 'SANDI-predicted_diravg.nii.gz'));
+
+MSE = mean((signal-S).^2,2);
+MSEmap = zeros(sx*sy*sz,numel(bvals));
+MSEmap(m==1) = MSE;
+MSEmap = reshape(MSEmap,[sx sy sz numel(bvals)]);
+nifti_struct_tmp = nifti_struct;
+nifti_struct_tmp.img = MSEmap;
+nifti_struct_tmp.hdr.dime.dim(5) = size(nifti_struct_tmp.img,4);
+if size(nifti_struct_tmp.img,4)==1
+    nifti_struct_tmp.hdr.dime.dim(1) = 3;
+else
+    nifti_struct_tmp.hdr.dime.dim(1) = 4;
+end
+nifti_struct_tmp.hdr.dime.datatype = 16;
+nifti_struct_tmp.hdr.dime.bitpix = 32;
+save_untouch_nii(nifti_struct_tmp,fullfile(output_folder, 'SANDI-fit_mse.nii.gz'));
+
+% Saving all SANDI parameter maps
 disp('Saving SANDI parametric maps')
 fprintf(SANDIinput.LogFileID,'Saving SANDI parametric maps\n');
 try
