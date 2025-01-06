@@ -7,8 +7,8 @@ The "***SANDI (Soma And Neurite Density Imaging) Matlab Toolbox***" enables mode
 For queries about the toolbox or suggestions on how to improve it, please email: palombom@cardiff.ac.uk
 
 ## Updates November 2024 
-- Compute and save the mean squared error map between SANDI fitted signal and input signals;
-- Compute and save the SANDI predicted direction-averaged signal. 
+- Compute and save the mean squared error map between SANDI fitted signals and input signals;
+- Compute and save the SANDI predicted direction-averaged signals. 
 
 ## Dependencies
 To use SANDI Matlab Toolbox you will need a MATLAB distribution with the Parallel Computing Toolbox, the Statistics and Machine Learning Toolbox and the Optimization Toolbox. Additionally, you will also need an external repository that is already included in the SANDI Matlab Toolbox:
