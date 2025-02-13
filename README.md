@@ -6,7 +6,10 @@ The "***SANDI (Soma And Neurite Density Imaging) Matlab Toolbox***" enables mode
 
 For queries about the toolbox or suggestions on how to improve it, please email: palombom@cardiff.ac.uk
 
-## Updates November 2024 
+## Updates February 2025 - Saving Training Set compatible with uGUIDE
+- Now it saves the Training Set used in the file 'TrainingSet.mat' within the folder 'Report_ML_Training_Performance'. The variables 'Signals_train' and 'Params_train' in the 'TrainingSet.mat' can be directly used for training uGUIDE in case SANDI Bayesian inference wants to be carried out using uGUIDE from https://github.com/mjallais/uGUIDE.
+
+## Updates November 2024 - Save Quality of Fit Metrics
 - Compute and save the mean squared error map between SANDI fitted signals and input signals;
 - Compute and save the SANDI predicted direction-averaged signals. 
 
