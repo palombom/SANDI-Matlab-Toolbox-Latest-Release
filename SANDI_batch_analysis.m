@@ -89,6 +89,18 @@ SANDIinput = TrainMachineLearningModel(SANDIinput); % trains the ML model on syn
 %investigate_exchange_effectes_NEXI_SANDI_RicianNoise(SANDIinput); % Runs
 %tests to estimate the bias due to unaccounted exchange between SANDI
 %compartments, using NEXI model https://doi.org/10.1016/j.neuroimage.2022.119277
+
+% Saving the Training Set
+Signals_train = SANDIinput.database_train_noisy;
+Params_train = SANDIinput.params_train;
+Performance_train = SANDIinput.train_perf;
+Bvals_train = SANDIinput.model.bvals;
+Sigma_mppca_train = SANDIinput.model.sigma_mppca;
+Sigma_SHresiduals_train = SANDIinput.model.sigma_SHresiduals;
+
+save(fullfile(SANDIinput.StudyMainFolder, 'Report_ML_Training_Performance','TrainingSet.mat'), 'Signals_train',...
+    'Params_train','Performance_train','Bvals_train', 'Sigma_mppca_train', 'Sigma_SHresiduals_train');
+
 %% STEP 3 - SANDI fit each subject
 SANDIinput = AnalyseAllDatasets(SANDIinput); % Analyse all the datasets, one by one
 
