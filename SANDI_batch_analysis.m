@@ -98,6 +98,8 @@ Bvals_train = SANDIinput.model.bvals;
 Sigma_mppca_train = SANDIinput.model.sigma_mppca;
 Sigma_SHresiduals_train = SANDIinput.model.sigma_SHresiduals;
 
+mkdir(fullfile(SANDIinput.StudyMainFolder, 'Report_ML_Training_Performance'));
+
 save(fullfile(SANDIinput.StudyMainFolder, 'Report_ML_Training_Performance','TrainingSet.mat'), 'Signals_train',...
     'Params_train','Performance_train','Bvals_train', 'Sigma_mppca_train', 'Sigma_SHresiduals_train');
 
